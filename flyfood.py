@@ -18,7 +18,6 @@ def ler_arquivo(arquivo_matriz):
 
     return quantidade_linhas, quantidade_colunas, origem, total_pontos_entrega
 
-
 def calcular_distancia(posicao_partida, posicao_chegada):
     distancia = abs(posicao_partida[0] - posicao_chegada[0]) + abs(posicao_partida[1] - posicao_chegada[1])
 
@@ -37,21 +36,4 @@ def calcular_custo_rota(origem, total_pontos_entrega, rota):
 
     return custo_total
 
-
-quantidade_linhas, quantidade_colunas, origem, total_pontos_entrega = ler_arquivo("matriz.txt")
-
-origem = (3, 0)
-
-total_pontos_entrega = {
-    "A": (1, 1),
-    "B": (3, 2),
-    "D": (0, 4),
-    "E": (3, 5)
-}
-
-rota = ["A", "B", "D", "E"]
-
-custo_rota = calcular_custo_rota(origem, total_pontos_entrega, rota)
-
-print(f"custo da rota {rota}: {custo_rota}")
 
