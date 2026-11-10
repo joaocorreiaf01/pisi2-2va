@@ -9,11 +9,11 @@ from deap import algorithms, base, benchmarks, cma, creator, gp, tools
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
-tamanho_populacao = 600
-probabilidade_mutacao_por_posicao = 0.4
+tamanho_populacao = 1000
+probabilidade_mutacao_por_posicao = 0.3
 tamanho_torneio = 3
 probabilidade_cruzamento = 0.9
-probabilidade_mutacao = 0.4
+probabilidade_mutacao = 0.3
 quantidade_geracoes = 3000
 lista_pontos = list(total_pontos_entrega)
 quantidade_pontos = len(lista_pontos)
