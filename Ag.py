@@ -1,4 +1,5 @@
 import random
+import time
 from flyfood import calcular_custo_rota
 from dados_entrega_flyfood import total_pontos_entrega, origem
 from deap import algorithms, base, benchmarks, cma, creator, gp, tools
@@ -8,12 +9,12 @@ from deap import algorithms, base, benchmarks, cma, creator, gp, tools
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
-tamanho_populacao = 0
-probabilidade_mutacao_por_posicao = 0
-tamanho_torneio = 0
-probabilidade_cruzamento = 0
-probabilidade_mutacao = 0
-quantidade_geracoes = 0
+tamanho_populacao = 200
+probabilidade_mutacao_por_posicao = 0.2
+tamanho_torneio = 3
+probabilidade_cruzamento = 0.9
+probabilidade_mutacao = 0.2
+quantidade_geracoes = 3000
 lista_pontos = list(total_pontos_entrega)
 quantidade_pontos = len(lista_pontos)
 
@@ -41,7 +42,11 @@ populacao = toolbox.criar_populacao(tamanho_populacao)
 #a aplicação do halloffame foi utilizando o repositório do deap no github como referência
 #exemplo de uso: https://github.com/DEAP/deap/blob/master/examples/ga/tsp.py
 melhores_rotas = tools.HallOfFame(1)
+
+tempo_inicial = time.time()
 algorithms.eaSimple(populacao, toolbox, probabilidade_cruzamento, probabilidade_mutacao, quantidade_geracoes, halloffame=melhores_rotas, verbose=False)
+tempo_total = time.time() - tempo_inicial
+
 melhor_individuo = melhores_rotas[0]
 
 melhor_rota = []
@@ -52,3 +57,4 @@ custo_melhor_rota = calcular_custo_rota(origem, total_pontos_entrega, melhor_rot
 
 print(f"melhor rota: {melhor_rota}")
 print(f"custo: {custo_melhor_rota}")
+print(f"tempo: {tempo_total:.2f} segundos")
