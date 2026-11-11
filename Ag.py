@@ -5,8 +5,8 @@ from dados_entrega_flyfood import total_pontos_entrega, origem
 from deap import algorithms, base, benchmarks, cma, creator, gp, tools
 from lerBrasil58 import distancias, custoCaminho
 
-#para alterar para o brasil58, colocar "brasil58"
-problema = "flyfood" 
+#para alterar para o flyfood, colocar "flyfood"
+problema = "brasil58"
 
 #consta em inglês na documentação, mantive igual
 #segue trecho: https://deap.readthedocs.io/en/master/tutorials/basic/part1.html
@@ -14,10 +14,9 @@ creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
 tamanho_populacao = 1000
-probabilidade_mutacao_por_posicao = 0.3
 tamanho_torneio = 3
-probabilidade_cruzamento = 0.9
-probabilidade_mutacao = 0.3
+probabilidade_cruzamento = 0.8
+probabilidade_mutacao = 0.2
 quantidade_geracoes = 3000
 lista_pontos = list(total_pontos_entrega)
 
@@ -41,16 +40,21 @@ def avaliar_rota(individuo):
 
     return (custo_rota,)
 
-#toolbox evaluate, mate, mutate e select precisam estar em inglês devido ao eaSimple,
-#segue trecho: https://deap.readthedocs.io/en/master/tutorials/basic/part2.html#using-the-toolbox em "Algoritmos"
+def mutacao_insercao(individuo):
+    posicao_retirada, posicao_nova = random.sample(range(len(individuo)), 2)
+    ponto = individuo.pop(posicao_retirada)
+    individuo.insert(posicao_nova, ponto)
+    return (individuo,)
+
+#toolbox evaluate, mate, mutate e select precisam estar em inglês devido ao eaMuPlusLambda, conforme descrito em documentação do deap
 toolbox = base.Toolbox()
 toolbox.register("gerar_rota_aleatoria", random.sample, range(quantidade_pontos), quantidade_pontos)
 toolbox.register("criar_individuo", tools.initIterate, creator.Individual, toolbox.gerar_rota_aleatoria)
 toolbox.register("criar_populacao", tools.initRepeat, list, toolbox.criar_individuo)
 toolbox.register("evaluate", avaliar_rota)
 toolbox.register("mate", tools.cxOrdered)
-toolbox.register("mutate", tools.mutShuffleIndexes, indpb=probabilidade_mutacao_por_posicao)
-toolbox.register("select", tools.selTournament, tournsize=tamanho_torneio)
+toolbox.register("mutate", mutacao_insercao)
+toolbox.register("select", tools.selBest)
 
 populacao = toolbox.criar_populacao(tamanho_populacao)
 
@@ -59,7 +63,7 @@ populacao = toolbox.criar_populacao(tamanho_populacao)
 melhores_rotas = tools.HallOfFame(1)
 
 tempo_inicial = time.time()
-algorithms.eaSimple(populacao, toolbox, probabilidade_cruzamento, probabilidade_mutacao, quantidade_geracoes, halloffame=melhores_rotas, verbose=False)
+algorithms.eaMuPlusLambda(populacao, toolbox, tamanho_populacao, tamanho_populacao, probabilidade_cruzamento, probabilidade_mutacao, quantidade_geracoes, halloffame=melhores_rotas, verbose=False)
 tempo_total = time.time() - tempo_inicial
 
 melhor_individuo = melhores_rotas[0]
