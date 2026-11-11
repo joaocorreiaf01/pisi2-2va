@@ -3,6 +3,10 @@ import time
 from flyfood import calcular_custo_rota
 from dados_entrega_flyfood import total_pontos_entrega, origem
 from deap import algorithms, base, benchmarks, cma, creator, gp, tools
+from lerBrasil58 import distancias, custoCaminho
+
+#para alterar para o brasil58, colocar "brasil58"
+problema = "flyfood" 
 
 #consta em inglês na documentação, mantive igual
 #segue trecho: https://deap.readthedocs.io/en/master/tutorials/basic/part1.html
@@ -16,14 +20,25 @@ probabilidade_cruzamento = 0.9
 probabilidade_mutacao = 0.3
 quantidade_geracoes = 3000
 lista_pontos = list(total_pontos_entrega)
-quantidade_pontos = len(lista_pontos)
+
+if problema == "flyfood":
+    quantidade_pontos = len(lista_pontos)
+else:
+    quantidade_pontos = 58
 
 def avaliar_rota(individuo):
     rota = []
-    for indice in individuo:
-        rota.append(lista_pontos[indice])
 
-    custo_rota = calcular_custo_rota(origem, total_pontos_entrega, rota)
+    if problema == "flyfood":
+        for indice in individuo:
+            rota.append(lista_pontos[indice])
+        custo_rota = calcular_custo_rota(origem, total_pontos_entrega, rota)
+        
+    else:
+        for indice in individuo:
+            rota.append(indice + 1)
+        custo_rota = custoCaminho(rota, distancias)
+
     return (custo_rota,)
 
 #toolbox evaluate, mate, mutate e select precisam estar em inglês devido ao eaSimple,
@@ -48,12 +63,19 @@ algorithms.eaSimple(populacao, toolbox, probabilidade_cruzamento, probabilidade_
 tempo_total = time.time() - tempo_inicial
 
 melhor_individuo = melhores_rotas[0]
-
 melhor_rota = []
-for indice in melhor_individuo:
-    melhor_rota.append(lista_pontos[indice])
 
-custo_melhor_rota = calcular_custo_rota(origem, total_pontos_entrega, melhor_rota)
+if problema == "flyfood":
+    for indice in melhor_individuo:
+        melhor_rota.append(lista_pontos[indice])
+
+    custo_melhor_rota = calcular_custo_rota(origem, total_pontos_entrega, melhor_rota)
+
+else:
+    for indice in melhor_individuo:
+        melhor_rota.append(indice + 1)
+        
+    custo_melhor_rota = custoCaminho(melhor_rota, distancias)
 
 print(f"melhor rota: {melhor_rota}")
 print(f"custo: {custo_melhor_rota}")
